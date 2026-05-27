@@ -2,11 +2,13 @@ from __future__ import annotations
 
 import random
 from dataclasses import dataclass, field
-from typing import List
+from typing import List, Set, Tuple
 
 from swarm.agent import Agent
 from swarm.environment import Environment
 from swarm.monitor import RuntimeMonitor
+
+Position = Tuple[int, int]
 
 
 @dataclass
@@ -22,6 +24,8 @@ class Simulation:
     current_step: int = field(default=0, init=False)
     finished: bool = field(default=False, init=False)
     finish_reason: str = field(default="", init=False)
+    completed_task_count: int = field(default=0, init=False)
+    completed_targets: Set[Position] = field(default_factory=set, init=False)
     environment: Environment = field(init=False)
     agents: List[Agent] = field(init=False)
     monitor: RuntimeMonitor = field(default_factory=RuntimeMonitor)
@@ -37,6 +41,7 @@ class Simulation:
             agents=self.agents,
             environment=self.environment,
             communication_radius=self.communication_radius,
+            completed_task_count=self.completed_task_count,
         )
 
     def step(self) -> None:
@@ -53,6 +58,7 @@ class Simulation:
             agents=self.agents,
             environment=self.environment,
             communication_radius=self.communication_radius,
+            completed_task_count=self.completed_task_count,
         )
 
         if not self.environment.targets:
@@ -81,6 +87,8 @@ class Simulation:
         targets = {
             (18, 2), (17, 12), (3, 13), (15, 10),
             (2, 4), (10, 13), (18, 7), (5, 10),
+            (19, 13), (16, 4), (4, 12), (14, 2),
+            (18, 10), (7, 13),
         }
         self.environment.targets.update(targets)
 
@@ -104,21 +112,21 @@ class Simulation:
         ]
 
     def _apply_runtime_changes(self, step: int) -> None:
-        """Introduce dynamic runtime changes."""
-        if step == 20:
+        """Introduce dynamic runtime changes before the simulation can finish."""
+        if step == 8:
             self.environment.add_obstacle((9, 6))
             self.environment.add_obstacle((9, 8))
-            self.monitor.events.append("[step 20] Dynamic obstacle introduced.")
+            self.monitor.events.append("[step 8] Dynamic obstacle introduced.")
 
-        if step == 35:
+        if step == 14:
             for agent in self.agents[:3]:
                 agent.communication_enabled = False
-            self.monitor.events.append("[step 35] Temporary communication loss for agents 0, 1, 2.")
+            self.monitor.events.append("[step 14] Temporary communication loss for agents 0, 1, 2.")
 
-        if step == 50:
+        if step == 20:
             for agent in self.agents[:3]:
                 agent.communication_enabled = True
-            self.monitor.events.append("[step 50] Communication restored for agents 0, 1, 2.")
+            self.monitor.events.append("[step 20] Communication restored for agents 0, 1, 2.")
 
     def _move_agents(self) -> None:
         """Move all agents one step according to their local policy."""
@@ -141,8 +149,14 @@ class Simulation:
     def _complete_tasks(self) -> None:
         """Handle completed tasks and reassign agents."""
         for agent in self.agents:
-            if agent.has_completed_task():
-                self.environment.remove_target(agent.position)
+            if agent.target is not None and agent.position == agent.target:
+                completed_target = agent.target
+
+                if completed_target not in self.completed_targets:
+                    self.completed_targets.add(completed_target)
+                    self.completed_task_count += 1
+
+                self.environment.remove_target(completed_target)
                 agent.target = None
 
         for agent in self.agents:

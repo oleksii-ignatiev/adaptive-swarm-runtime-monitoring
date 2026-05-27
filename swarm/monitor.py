@@ -22,19 +22,19 @@ class RuntimeMonitor:
         agents: List[Agent],
         environment: Environment,
         communication_radius: int,
+        completed_task_count: int,
     ) -> None:
         """Evaluate safety and coordination constraints for the current step."""
         self._check_collisions(step, agents)
         self._check_obstacle_violations(step, agents, environment)
         connected_components = self._check_connectivity(step, agents, communication_radius)
 
-        completed = sum(1 for agent in agents if agent.has_completed_task())
         active = sum(1 for agent in agents if agent.active)
 
         self.metrics.append({
             "step": step,
             "active_agents": active,
-            "completed_tasks": completed,
+            "completed_tasks": completed_task_count,
             "remaining_targets": len(environment.targets),
             "connected_components": connected_components,
         })
@@ -124,16 +124,16 @@ class RuntimeMonitor:
 
     def print_summary(self) -> None:
         """Print event log and final metrics."""
-        print("\nRuntime monitor events")
+        print("\\nRuntime monitor events")
         print("----------------------")
 
         if not self.events:
             print("No safety warnings recorded.")
         else:
-            for event in self.events[-40:]:
+            for event in self.events[-60:]:
                 print(event)
 
-        print("\nFinal metrics")
+        print("\\nFinal metrics")
         print("-------------")
 
         if self.metrics:
