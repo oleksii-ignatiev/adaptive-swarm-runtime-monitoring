@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from typing import Optional
 
+from matplotlib.lines import Line2D
+
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 from matplotlib.widgets import Button
@@ -95,7 +97,7 @@ class InteractiveSwarmView:
         self.axis.set_xlabel("x")
         self.axis.set_ylabel("y")
         self.axis.grid(True)
-        self.axis.legend(loc="upper right")
+        self._draw_custom_legend()
 
         self.status_text.set_text(self.simulation.monitor.get_latest_status())
         self.event_text.set_text(self.simulation.monitor.get_latest_event())
@@ -218,3 +220,18 @@ class InteractiveSwarmView:
                         linewidth=0.6,
                         alpha=0.25,
                     )
+
+
+    def _draw_custom_legend(self) -> None:
+        """Draw custom legend entries for all visual layers."""
+        legend_items = [
+            Line2D([0], [0], marker="s", linestyle="", markersize=8, label="Obstacles"),
+            Line2D([0], [0], marker="o", linestyle="", markersize=8, label="Agents"),
+            Line2D([0], [0], marker="*", linestyle="", markersize=12, label="Targets"),
+            Line2D([0], [0], linestyle="-", linewidth=1.0, alpha=0.35, label="Agent trajectory"),
+            Line2D([0], [0], linestyle="-", linewidth=1.0, alpha=0.25, label="Communication link"),
+            Line2D([0], [0], linestyle=":", linewidth=1.0, label="Target assignment"),
+            Line2D([0], [0], marker="x", linestyle="", markersize=8, label="Communication disabled"),
+        ]
+
+        self.axis.legend(handles=legend_items, loc="upper right")
