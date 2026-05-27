@@ -81,6 +81,8 @@ class InteractiveSwarmView:
 
         self._draw_obstacles()
         self._draw_targets()
+        self._draw_trajectories()
+        self._draw_communication_links()
         self._draw_agents()
 
         title = "Adaptive Swarm Runtime Monitoring"
@@ -176,3 +178,43 @@ class InteractiveSwarmView:
                     linestyle=":",
                     linewidth=0.8,
                 )
+
+
+    def _draw_trajectories(self) -> None:
+        """Draw movement history for each agent."""
+        for agent_id, path in self.simulation.agent_paths.items():
+            if len(path) < 2:
+                continue
+
+            path_x = [position[0] for position in path]
+            path_y = [position[1] for position in path]
+
+            self.axis.plot(
+                path_x,
+                path_y,
+                linestyle="-",
+                linewidth=0.7,
+                alpha=0.35,
+            )
+
+    def _draw_communication_links(self) -> None:
+        """Draw active communication links between connected agents."""
+        agents = [
+            agent for agent in self.simulation.agents
+            if agent.active and agent.communication_enabled
+        ]
+
+        radius = self.simulation.communication_radius
+
+        for i, first in enumerate(agents):
+            for second in agents[i + 1:]:
+                distance = abs(first.position[0] - second.position[0]) + abs(first.position[1] - second.position[1])
+
+                if distance <= radius:
+                    self.axis.plot(
+                        [first.position[0], second.position[0]],
+                        [first.position[1], second.position[1]],
+                        linestyle="-",
+                        linewidth=0.6,
+                        alpha=0.25,
+                    )

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import random
 from dataclasses import dataclass, field
-from typing import List, Set, Tuple
+from typing import Dict, List, Set, Tuple
 
 from swarm.agent import Agent
 from swarm.environment import Environment
@@ -26,6 +26,7 @@ class Simulation:
     finish_reason: str = field(default="", init=False)
     completed_task_count: int = field(default=0, init=False)
     completed_targets: Set[Position] = field(default_factory=set, init=False)
+    agent_paths: Dict[int, List[Position]] = field(default_factory=dict, init=False)
     environment: Environment = field(init=False)
     agents: List[Agent] = field(init=False)
     monitor: RuntimeMonitor = field(default_factory=RuntimeMonitor)
@@ -36,6 +37,7 @@ class Simulation:
         self._create_obstacles()
         self._create_targets()
         self._create_agents()
+        self._initialize_agent_paths()
         self.monitor.evaluate(
             step=self.current_step,
             agents=self.agents,
@@ -52,6 +54,7 @@ class Simulation:
         self.current_step += 1
         self._apply_runtime_changes(self.current_step)
         self._move_agents()
+        self._record_agent_paths()
         self._complete_tasks()
         self.monitor.evaluate(
             step=self.current_step,
@@ -110,6 +113,18 @@ class Simulation:
             )
             for index in range(self.agent_count)
         ]
+
+    def _initialize_agent_paths(self) -> None:
+        """Create initial movement path history for all agents."""
+        self.agent_paths = {
+            agent.agent_id: [agent.position]
+            for agent in self.agents
+        }
+
+    def _record_agent_paths(self) -> None:
+        """Record current positions after each movement step."""
+        for agent in self.agents:
+            self.agent_paths.setdefault(agent.agent_id, []).append(agent.position)
 
     def _apply_runtime_changes(self, step: int) -> None:
         """Introduce dynamic runtime changes before the simulation can finish."""

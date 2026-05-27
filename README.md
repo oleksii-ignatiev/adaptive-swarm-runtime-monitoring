@@ -29,6 +29,8 @@ Press Finish to stop manually.
 - blue squares: obstacles
 - star markers: remaining targets
 - dotted lines: current agent-to-target assignments
+- thin lines between agents: active communication links
+- pale trajectory lines: previous movement paths
 - x markers: agents with disabled communication
 - status line: current step, active agents, completed tasks, remaining targets, communication components
 - latest monitor event
@@ -48,3 +50,14 @@ Safety and communication monitoring
       ↓
 Metrics and event log
 ```
+
+
+## Visualization details
+
+The interactive view includes two extra layers:
+
+1. Agent trajectories  
+   Each agent leaves a movement trace. This makes adaptation visible because the viewer can see how the swarm moved around obstacles and how agents changed direction during the run.
+
+2. Communication links  
+   Agents within communication radius are connected by thin lines. When communication is disabled for agents 0, 1, and 2, those agents are shown with x markers and their communication links disappear. This makes communication fragmentation visible directly in the simulation window.
