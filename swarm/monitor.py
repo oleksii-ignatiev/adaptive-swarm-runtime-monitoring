@@ -101,6 +101,27 @@ class RuntimeMonitor:
 
         return components
 
+    def get_latest_status(self) -> str:
+        """Return a compact status line for the visualization."""
+        if not self.metrics:
+            return "Step: 0 | Waiting to start"
+
+        latest = self.metrics[-1]
+
+        return (
+            f"Step: {latest['step']} | "
+            f"Active agents: {latest['active_agents']} | "
+            f"Completed tasks: {latest['completed_tasks']} | "
+            f"Remaining targets: {latest['remaining_targets']} | "
+            f"Communication components: {latest['connected_components']}"
+        )
+
+    def get_latest_event(self) -> str:
+        """Return the latest monitor event."""
+        if not self.events:
+            return "No monitor warnings."
+        return self.events[-1]
+
     def print_summary(self) -> None:
         """Print event log and final metrics."""
         print("\nRuntime monitor events")
@@ -109,7 +130,7 @@ class RuntimeMonitor:
         if not self.events:
             print("No safety warnings recorded.")
         else:
-            for event in self.events[-30:]:
+            for event in self.events[-40:]:
                 print(event)
 
         print("\nFinal metrics")

@@ -7,12 +7,11 @@ from typing import List
 from swarm.agent import Agent
 from swarm.environment import Environment
 from swarm.monitor import RuntimeMonitor
-from swarm.visualization import visualize
 
 
 @dataclass
 class Simulation:
-    """Runs the adaptive swarm simulation."""
+    """Runs one adaptive swarm simulation."""
 
     width: int
     height: int
@@ -20,6 +19,9 @@ class Simulation:
     max_steps: int
     communication_radius: int
     seed: int = 1
+    current_step: int = field(default=0, init=False)
+    finished: bool = field(default=False, init=False)
+    finish_reason: str = field(default="", init=False)
     environment: Environment = field(init=False)
     agents: List[Agent] = field(init=False)
     monitor: RuntimeMonitor = field(default_factory=RuntimeMonitor)
@@ -30,28 +32,41 @@ class Simulation:
         self._create_obstacles()
         self._create_targets()
         self._create_agents()
+        self.monitor.evaluate(
+            step=self.current_step,
+            agents=self.agents,
+            environment=self.environment,
+            communication_radius=self.communication_radius,
+        )
 
-    def run(self, show_visualization: bool = True) -> None:
-        """Run the simulation loop."""
-        for step in range(self.max_steps):
-            self._apply_runtime_changes(step)
-            self._move_agents()
-            self._complete_tasks()
-            self.monitor.evaluate(
-                step=step,
-                agents=self.agents,
-                environment=self.environment,
-                communication_radius=self.communication_radius,
-            )
+    def step(self) -> None:
+        """Execute one simulation step."""
+        if self.finished:
+            return
 
-            if not self.environment.targets:
-                print(f"All tasks completed at step {step}.")
-                break
+        self.current_step += 1
+        self._apply_runtime_changes(self.current_step)
+        self._move_agents()
+        self._complete_tasks()
+        self.monitor.evaluate(
+            step=self.current_step,
+            agents=self.agents,
+            environment=self.environment,
+            communication_radius=self.communication_radius,
+        )
 
-        self.monitor.print_summary()
+        if not self.environment.targets:
+            self.finished = True
+            self.finish_reason = f"All tasks completed at step {self.current_step}."
 
-        if show_visualization:
-            visualize(self.environment, self.agents, self.monitor.metrics)
+        if self.current_step >= self.max_steps:
+            self.finished = True
+            self.finish_reason = f"Maximum step count reached at step {self.current_step}."
+
+    def finish_manually(self) -> None:
+        """Stop the simulation manually."""
+        self.finished = True
+        self.finish_reason = f"Stopped manually at step {self.current_step}."
 
     def _create_obstacles(self) -> None:
         """Create static obstacles in the environment."""
@@ -93,17 +108,17 @@ class Simulation:
         if step == 20:
             self.environment.add_obstacle((9, 6))
             self.environment.add_obstacle((9, 8))
-            print("[step 20] Dynamic obstacle introduced.")
+            self.monitor.events.append("[step 20] Dynamic obstacle introduced.")
 
         if step == 35:
             for agent in self.agents[:3]:
                 agent.communication_enabled = False
-            print("[step 35] Temporary communication loss for agents 0, 1, 2.")
+            self.monitor.events.append("[step 35] Temporary communication loss for agents 0, 1, 2.")
 
         if step == 50:
             for agent in self.agents[:3]:
                 agent.communication_enabled = True
-            print("[step 50] Communication restored for agents 0, 1, 2.")
+            self.monitor.events.append("[step 50] Communication restored for agents 0, 1, 2.")
 
     def _move_agents(self) -> None:
         """Move all agents one step according to their local policy."""

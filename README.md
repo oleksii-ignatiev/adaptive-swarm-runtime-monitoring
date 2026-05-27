@@ -1,49 +1,51 @@
 # Adaptive Swarm Runtime Monitoring
 
-A small Python simulation of adaptive swarm coordination with runtime safety monitoring.
+A small interactive Python simulation of adaptive swarm coordination with runtime safety monitoring.
 
-This project was created as a compact research-oriented demonstration for work on trustworthy adaptive autonomous systems. It models a group of agents moving in a grid environment, reacting to dynamic obstacles, temporary communication loss, and task reassignment.
+This project demonstrates a simplified adaptive swarm system. Agents start from an initial position, move toward assigned targets, adapt around obstacles, react to dynamic runtime changes, and are monitored for safety and communication issues.
 
-The goal is not to simulate real drones physically. The goal is to demonstrate the core software ideas behind adaptive swarm systems:
+The simulation has an interactive window with:
 
-- decentralized agents
-- local decision-making
-- runtime adaptation
-- safety constraint monitoring
-- communication graph tracking
-- event logging and metrics
+- initial swarm state
+- Start button
+- Finish button
+- step-by-step movement
+- dynamic obstacle introduction
+- temporary communication failure
+- runtime monitor status
+- automatic stop when all tasks are completed or the maximum step count is reached
 
-## Research motivation
+## Research idea
 
-Heterogeneous adaptive swarm systems need to continue operating when the environment changes at runtime. A swarm may face obstacles, communication degradation, disconnected agents, task failures, or unsafe movement decisions.
+The project explores a simplified version of this question:
 
-This project explores a simplified version of that problem:
+How can a group of autonomous agents adapt at runtime while a monitor checks safety-relevant conditions?
 
-How can a group of agents adapt their movement and task allocation during execution while a runtime monitor checks safety-relevant conditions?
-
-The simulation focuses on:
-
-- collision avoidance
-- obstacle avoidance
-- communication connectivity
-- dynamic task completion
-- runtime event tracing
-
-## Project structure
+The goal is not physical drone realism. The goal is to show the software pattern behind adaptive swarm systems:
 
 ```text
-adaptive-swarm-runtime-monitoring/
-├── main.py
-├── requirements.txt
-├── README.md
-└── swarm/
-    ├── __init__.py
-    ├── agent.py
-    ├── environment.py
-    ├── monitor.py
-    ├── simulation.py
-    └── visualization.py
+Environment state
+      ↓
+Local agent decisions
+      ↓
+Runtime adaptation
+      ↓
+Safety and communication monitoring
+      ↓
+Metrics and event log
 ```
+
+## What the simulation demonstrates
+
+- decentralized agents
+- local movement decisions
+- runtime adaptation
+- dynamic obstacles
+- temporary communication degradation
+- collision monitoring
+- obstacle violation monitoring
+- communication graph monitoring
+- task completion tracking
 
 ## Installation
 
@@ -67,49 +69,22 @@ pip install -r requirements.txt
 python main.py
 ```
 
-The simulation prints runtime events and opens a simple visualization of the swarm state.
+Then press Start in the simulation window.
 
-## What the simulation does
+Press Finish to stop manually.
 
-1. Creates a grid environment.
-2. Creates agents with individual start positions and assigned target tasks.
-3. Adds static obstacles.
-4. Introduces a dynamic obstacle during runtime.
-5. Simulates temporary communication loss for selected agents.
-6. Lets agents adapt their movement locally.
-7. Uses a runtime monitor to check collisions, obstacle violations, communication connectivity, and task progress.
-8. Records metrics for each step.
+The simulation also stops automatically when all tasks are completed or the maximum step count is reached.
 
-## Why this is relevant to adaptive swarm systems
+## Runtime events
 
-Real swarm systems require runtime assurance. A swarm can adapt its behavior, and the system still needs to remain safe, traceable, and understandable.
+At step 20, a dynamic obstacle is introduced.
 
-This project demonstrates the basic software pattern:
+At step 35, communication is disabled for agents 0, 1, and 2.
 
-```text
-Environment state
-      ↓
-Agent decision
-      ↓
-Runtime adaptation
-      ↓
-Safety monitor
-      ↓
-Metrics and logs
-```
+At step 50, communication is restored for these agents.
 
-## Possible extensions
-
-- Add heterogeneous agent types
-- Add energy/battery constraints
-- Add probabilistic communication failure
-- Add reinforcement learning based movement policies
-- Add ROS2 integration
-- Add digital twin style monitoring dashboard
-- Add formal temporal logic constraints
-- Add distributed consensus for task allocation
+The runtime monitor displays current status in the window and prints a summary after the simulation is finished.
 
 ## Author
 
-Oleksii Ignatiev  
-Software Engineer with background in Mathematics and Computer Science
+Oleksii Ignatiev
