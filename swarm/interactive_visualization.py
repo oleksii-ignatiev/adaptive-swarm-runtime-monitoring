@@ -234,4 +234,13 @@ class InteractiveSwarmView:
             Line2D([0], [0], marker="x", linestyle="", markersize=8, label="Communication disabled"),
         ]
 
-        self.axis.legend(handles=legend_items, loc="upper right")
+        self.axis.legend(
+            handles=legend_items,
+            loc="upper left",
+            fontsize=8,
+            framealpha=0.9,
+            borderpad=0.4,
+            labelspacing=0.3,
+            handlelength=1.6,
+            handletextpad=0.5,
+        )
