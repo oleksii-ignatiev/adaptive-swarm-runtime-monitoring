@@ -21,7 +21,7 @@ python main.py
 
 Then press Start in the simulation window.
 
-Press Finish to stop manually.
+Press Pause to stop temporarily. Press Start again to continue. Press Finish to stop the simulation permanently.
 
 ## What the window shows
 
@@ -61,3 +61,12 @@ The interactive view includes two extra layers:
 
 2. Communication links  
    Agents within communication radius are connected by thin lines. When communication is disabled for agents 0, 1, and 2, those agents are shown with x markers and their communication links disappear. This makes communication fragmentation visible directly in the simulation window.
+
+
+## Controls
+
+Start starts the simulation or resumes it after Pause.
+
+Pause stops the animation temporarily without changing the simulation state.
+
+Finish ends the simulation manually. After Finish, Start does not resume the run because the simulation is finalized.

@@ -24,13 +24,16 @@ class InteractiveSwarmView:
         self.figure, self.axis = plt.subplots(figsize=(10, 7))
         self.figure.subplots_adjust(bottom=0.22)
 
-        start_axis = self.figure.add_axes([0.32, 0.06, 0.14, 0.07])
-        finish_axis = self.figure.add_axes([0.54, 0.06, 0.14, 0.07])
+        start_axis = self.figure.add_axes([0.25, 0.06, 0.14, 0.07])
+        pause_axis = self.figure.add_axes([0.43, 0.06, 0.14, 0.07])
+        finish_axis = self.figure.add_axes([0.61, 0.06, 0.14, 0.07])
 
         self.start_button = Button(start_axis, "Start")
+        self.pause_button = Button(pause_axis, "Pause")
         self.finish_button = Button(finish_axis, "Finish")
 
         self.start_button.on_clicked(self._start)
+        self.pause_button.on_clicked(self._pause)
         self.finish_button.on_clicked(self._finish)
 
         self.status_text = self.figure.text(0.5, 0.16, "", ha="center", fontsize=10)
@@ -52,12 +55,18 @@ class InteractiveSwarmView:
         """Start or resume the simulation."""
         if not self.simulation.finished:
             self.running = True
+            self._draw()
 
     def _finish(self, event) -> None:
         """Stop the simulation manually."""
         self.running = False
         self.simulation.finish_manually()
         self._print_summary_once()
+        self._draw()
+
+    def _pause(self, event) -> None:
+        """Pause the simulation without finalizing it."""
+        self.running = False
         self._draw()
 
     def _animate(self, frame_index: int) -> None:
