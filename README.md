@@ -13,6 +13,14 @@ The runtime scenario is timed so that all major events happen before the simulat
 - Step 20: communication is restored for agents 0, 1, and 2.
 - The simulation continues until all targets are completed or until the maximum step count is reached.
 
+## Installation
+
+```bash
+python -m venv .venv
+.venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+```
+
 ## Run
 
 ```bash
